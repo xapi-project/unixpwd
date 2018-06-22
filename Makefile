@@ -10,12 +10,15 @@ VOPTS   += --track-origins=yes
 
 .PHONY: all clean indent
 
-all:
+all: 	myocaml opasswd
+
+opasswd: opasswd.c
 		$(CC) $(CFLAGS) -o opasswd opasswd.c
 
 clean:
 		rm -f opasswd opasswd.o
 		rm -f pwd.cma pwd.cmi pwd.cmo libpwd.a myocaml
+		rm -f shadow.* passwd.*
 
 myocaml:  opasswd.o pwd.cmo libpwd.a
 		ocamlmktop -I . -o myocaml -custom pwd.cmo libpwd.a
