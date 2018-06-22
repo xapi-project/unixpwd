@@ -61,9 +61,9 @@ getpwd(const char *user)
                    *pw;
     char            buf[BUFLEN];
 
-    if (getspnam_r(user, &spw, buf, BUFLEN, &sp) == 0)
+    if (getspnam_r(user, &spw, buf, BUFLEN, &sp) == 0 && sp)
         return strdup(sp->sp_pwdp);
-    if (getpwnam_r(user, &pwd, buf, BUFLEN, &pw) == 0)
+    if (getpwnam_r(user, &pwd, buf, BUFLEN, &pw) == 0 && pw)
         return strdup(pw->pw_passwd);
     return NULL;
 }
@@ -84,6 +84,7 @@ setpwd(char *user, char *password)
     static char     tmp_name[] = TMP_PASSWD;
     struct stat     statbuf;
     int             rc;
+    int             updated = 0;
 
     tmp = mkstemp(tmp_name);
     if (!tmp)
@@ -101,10 +102,12 @@ setpwd(char *user, char *password)
     setpwent();
     while (1) {
         rc = getpwent_r(&pwd, buf, BUFLEN, &pw);
-        if (rc != 0)
+        if (rc != 0 || !pw)
             break;
-        if (!strcmp(user, pw->pw_name))
+        if (!strcmp(user, pw->pw_name)) {
             pw->pw_passwd = password;
+            updated++;
+        }
         putpwent(pw, tmp_file);
     }
     endpwent();
@@ -112,6 +115,8 @@ setpwd(char *user, char *password)
     fclose(tmp_file);
     if (rc != ENOENT)
         return rc;
+    if (!updated)
+        return EINVAL;
     if (rename(tmp_name, ETC_PASSWD) != 0)
         return errno;
     return 0;
@@ -133,6 +138,7 @@ setspw(char *user, char *password)
     static char     tmp_name[] = TMP_SPASSWD;
     struct stat     statbuf;
     int             rc;
+    int             updated = 0;
 
     tmp = mkstemp(tmp_name);
     if (!tmp)
@@ -150,10 +156,12 @@ setspw(char *user, char *password)
     setspent();
     while (1) {
         rc = getspent_r(&spw, buf, BUFLEN, &sp);
-        if (rc != 0)
+        if (rc != 0 || !sp)
             break;
-        if (!strcmp(user, sp->sp_namp))
+        if (!strcmp(user, sp->sp_namp)) {
             sp->sp_pwdp = password;
+            updated++;
+        }
         putspent(sp, tmp_file);
     }
     endspent();
@@ -161,6 +169,8 @@ setspw(char *user, char *password)
     fclose(tmp_file);
     if (rc != ENOENT)
         return rc;
+    if (!updated)
+        return EINVAL;
     if (rename(tmp_name, ETC_SPASSWD) != 0)
         return errno;
     return 0;
@@ -239,8 +249,10 @@ caml_getpwd(value caml_user)
 
     user = String_val(caml_user);
     passwd = getpwd(user);
+    if (passwd == NULL && errno != 0)
+        caml_failwith(strerror(errno));
     if (passwd == NULL)
-        caml_raise_not_found();
+        caml_failwith("unspecified error in caml_getpwd()");
 
     pw = caml_copy_string(passwd);
     free(passwd);
@@ -258,7 +270,9 @@ caml_setpwd(value caml_user, value caml_password)
     user = String_val(caml_user);
     password = String_val(caml_password);
     rc = setpwd(user, password);
-    CAMLreturn(Val_int(rc));
+    if (rc != 0)
+        caml_failwith(strerror(rc));
+    CAMLreturn(Val_unit);
 }
 
 CAMLprim        value
@@ -272,7 +286,9 @@ caml_setspw(value caml_user, value caml_password)
     user = String_val(caml_user);
     password = String_val(caml_password);
     rc = setspw(user, password);
-    CAMLreturn(Val_int(rc));
+    if (rc != 0)
+        caml_failwith(strerror(rc));
+    CAMLreturn(Val_unit);
 }
 
 CAMLprim        value
@@ -283,8 +299,10 @@ caml_unshadow(void)
     CAMLlocal1(str);
 
     passwords = unshadow();
+    if (passwords == NULL && errno != 0)
+        caml_failwith(strerror(errno));
     if (passwords == NULL)
-        caml_raise_not_found();
+        caml_failwith("unspecified error in caml_unshadow()");
 
     str = caml_copy_string(passwords);
     free(passwords);
