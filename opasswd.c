@@ -152,6 +152,8 @@ setspw(char *user, char *password)
     tmp_file = fdopen(tmp, "w");
     if (!tmp_file)
         return errno;
+    if (lckpwdf() != 0)
+        return ENOLCK;
 
     setspent();
     while (1) {
@@ -167,12 +169,19 @@ setspw(char *user, char *password)
     endspent();
 
     fclose(tmp_file);
-    if (rc != ENOENT)
+    if (rc != ENOENT) {
+        ulckpwdf();
         return rc;
-    if (!updated)
+    }
+    if (!updated) {
+        ulckpwdf();
         return EINVAL;
-    if (rename(tmp_name, ETC_SPASSWD) != 0)
+    }
+    if (rename(tmp_name, ETC_SPASSWD) != 0) {
+        ulckpwdf();
         return errno;
+    }
+    ulckpwdf();
     return 0;
 }
 
