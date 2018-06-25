@@ -23,16 +23,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#ifndef MAIN
-#include <caml/alloc.h>
-#include <caml/mlvalues.h>
-#include <caml/fail.h>
-#include <caml/callback.h>
-#include <caml/memory.h>
-#endif
-
-#define DEVELOPMENT
-
 #ifdef DEVELOPMENT
 #define ETC_PASSWD   "passwd"
 #define TMP_PASSWD   "passwd.XXXXXX"
@@ -46,14 +36,9 @@
 #endif
 
 #define BUFLEN 4096
-/*
- * getpw: return the encrypted password for the user. This memory must
- * be freed by the caller. On error and when no password entry is found,
- * set errno and return NULL.
- */
 
-static char    *
-getpwd(const char *user)
+char           *
+unixpwd_get(const char *user)
 {
     struct spwd     spw,
                    *sp;
@@ -68,12 +53,8 @@ getpwd(const char *user)
     return NULL;
 }
 
-/*
- * setpwd set password entry for a user
- */
-
-static int
-setpwd(char *user, char *password)
+int
+unixpwd_setpwd(const char *user, char *password)
 {
 
     struct passwd   pwd,
@@ -89,15 +70,23 @@ setpwd(char *user, char *password)
     tmp = mkstemp(tmp_name);
     if (!tmp)
         return errno;
-    if (stat(ETC_PASSWD, &statbuf) != 0)
+    if (stat(ETC_PASSWD, &statbuf) != 0) {
+        close(tmp);
         return errno;
-    if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0)
+    }
+    if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0) {
+        close(tmp);
         return errno;
-    if (fchmod(tmp, statbuf.st_mode) != 0)
+    }
+    if (fchmod(tmp, statbuf.st_mode) != 0) {
+        close(tmp);
         return errno;
+    }
     tmp_file = fdopen(tmp, "w");
-    if (!tmp_file)
+    if (!tmp_file) {
+        close(tmp);
         return errno;
+    }
 
     setpwent();
     while (1) {
@@ -123,11 +112,8 @@ setpwd(char *user, char *password)
 }
 
 
-/*
- * setspw - set shadow password for user
- */
-static int
-setspw(char *user, char *password)
+int
+unixpwd_setspw(const char *user, char *password)
 {
 
     struct spwd     spw,
@@ -143,17 +129,27 @@ setspw(char *user, char *password)
     tmp = mkstemp(tmp_name);
     if (!tmp)
         return errno;
-    if (stat(ETC_SPASSWD, &statbuf) != 0)
+    if (stat(ETC_SPASSWD, &statbuf) != 0) {
+        close(tmp);
         return errno;
-    if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0)
+    }
+    if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0) {
+        close(tmp);
         return errno;
-    if (fchmod(tmp, statbuf.st_mode) != 0)
+    }
+    if (fchmod(tmp, statbuf.st_mode) != 0) {
+        close(tmp);
         return errno;
+    }
     tmp_file = fdopen(tmp, "w");
-    if (!tmp_file)
+    if (!tmp_file) {
+        close(tmp);
         return errno;
-    if (lckpwdf() != 0)
+    }
+    if (lckpwdf() != 0) {
+        close(tmp);
         return ENOLCK;
+    }
 
     setspent();
     while (1) {
@@ -185,13 +181,8 @@ setspw(char *user, char *password)
     return 0;
 }
 
-/*
- * unshadow - return /etc/passwd as a string but with password entries from
- * the shadow password file if it has a corresponding entry. The memory
- * returned by this function must be freed by the caller.
- */
-static char    *
-unshadow(void)
+char           *
+unixpwd_unshadow(void)
 {
     struct spwd     spw,
                    *sp;
@@ -246,129 +237,3 @@ unshadow(void)
 
     return buf;
 }
-
-#ifndef MAIN
-CAMLprim        value
-caml_getpwd(value caml_user)
-{
-    CAMLparam1(caml_user);
-    char           *user;
-    char           *passwd;
-    CAMLlocal1(pw);
-
-    user = String_val(caml_user);
-    passwd = getpwd(user);
-    if (passwd == NULL && errno != 0)
-        caml_failwith(strerror(errno));
-    if (passwd == NULL)
-        caml_failwith("unspecified error in caml_getpwd()");
-
-    pw = caml_copy_string(passwd);
-    free(passwd);
-    CAMLreturn(pw);
-}
-
-CAMLprim        value
-caml_setpwd(value caml_user, value caml_password)
-{
-    CAMLparam2(caml_user, caml_password);
-    char           *user,
-                   *password;
-    int             rc;
-
-    user = String_val(caml_user);
-    password = String_val(caml_password);
-    rc = setpwd(user, password);
-    if (rc != 0)
-        caml_failwith(strerror(rc));
-    CAMLreturn(Val_unit);
-}
-
-CAMLprim        value
-caml_setspw(value caml_user, value caml_password)
-{
-    CAMLparam2(caml_user, caml_password);
-    char           *user,
-                   *password;
-    int             rc;
-
-    user = String_val(caml_user);
-    password = String_val(caml_password);
-    rc = setspw(user, password);
-    if (rc != 0)
-        caml_failwith(strerror(rc));
-    CAMLreturn(Val_unit);
-}
-
-CAMLprim        value
-caml_unshadow(void)
-{
-    CAMLparam0();
-    char           *passwords;
-    CAMLlocal1(str);
-
-    passwords = unshadow();
-    if (passwords == NULL && errno != 0)
-        caml_failwith(strerror(errno));
-    if (passwords == NULL)
-        caml_failwith("unspecified error in caml_unshadow()");
-
-    str = caml_copy_string(passwords);
-    free(passwords);
-    CAMLreturn(str);
-}
-#endif
-
-#ifdef MAIN
-int
-main(int argc, char **argv)
-{
-    int             rc;
-    char           *pw;
-    char           *buf;
-
-    switch (argc) {
-    case 1:
-        buf = unshadow();
-        if (buf) {
-            puts(buf);
-            free(buf);
-        } else {
-            fprintf(stderr, "can't unshadow\n");
-        }
-        break;
-
-    case 2:
-        pw = getpwd(argv[1]);
-        if (pw) {
-            printf("%s: %s\n", argv[1], pw);
-            free(pw);
-            rc = 0;
-        } else {
-            fprintf(stderr, "can't find entry for %s\n", argv[1]);
-            rc = 1;
-        }
-        break;
-
-    case 3:
-        rc = setpwd(argv[1], argv[2]);
-        if (rc != 0) {
-            fprintf(stderr, "error setting password: %d\n", rc);
-            rc = 1;
-            break;
-        }
-        rc = setspw(argv[1], argv[2]);
-        if (rc != 0) {
-            fprintf(stderr, "error setting shadow password: %d\n", rc);
-            rc = 1;
-            break;
-        }
-        break;
-
-    default:
-        fprintf(stderr, "usage: opasswd user [password]\n");
-        rc = 1;
-    }
-    exit(rc);
-}
-#endif
