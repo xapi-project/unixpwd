@@ -1,4 +1,6 @@
 #
+# Makefile to build a stand-alone binary for testing
+#
 
 CC 		= gcc
 CFLAGS 	= -g -DDEVELOPMENT
@@ -11,7 +13,7 @@ VOPTS   += --track-origins=yes
 
 .PHONY: all clean indent valgrind
 
-all: 	unixpwd myocaml
+all: 	unixpwd
 
 unixpwd: main.o unixpwd.o
 		$(CC) $(CFLAGS) -o unixpwd unixpwd.o main.o
@@ -19,20 +21,7 @@ unixpwd: main.o unixpwd.o
 clean:
 		rm -f unixpwd
 		rm -f *.o
-		rm -f unixpwd.cma unixpwd.cmi unixpwd.cmo libunixpwd.a myocaml
 		rm -f shadow.* passwd.*
-
-myocaml:  unixpwd.cmo libunixpwd.a
-		ocamlmktop -I . -o myocaml -custom $^
-
-unixpwd_stub.o: unixpwd_stub.c unixpwd.h
-		ocamlc -c $<
-
-libunixpwd.a: 	unixpwd.o unixpwd_stub.o
-		ar cr $@ $^
-
-unixpwd.cmo: unixpwd.ml
-		ocamlc -c -o $@ $<
 
 indent:
 		indent -orig -nut unixpwd.c unixpwd.h unixpwd_stub.c
