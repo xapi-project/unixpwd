@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <limits.h>
 
 #ifdef DEVELOPMENT
 #define ETC_PASSWD   "passwd"
@@ -62,11 +63,12 @@ unixpwd_setpwd(const char *user, char *password)
     char            buf[BUFLEN];
     int             tmp;
     FILE           *tmp_file;
-    static char     tmp_name[] = TMP_PASSWD;
+    char            tmp_name[PATH_MAX];
     struct stat     statbuf;
     int             rc;
     int             updated = 0;
 
+    strcpy(tmp_name, TMP_PASSWD);
     tmp = mkstemp(tmp_name);
     if (!tmp)
         return errno;
@@ -121,11 +123,12 @@ unixpwd_setspw(const char *user, char *password)
     char            buf[BUFLEN];
     int             tmp;
     FILE           *tmp_file;
-    static char     tmp_name[] = TMP_SPASSWD;
+    char            tmp_name[PATH_MAX];
     struct stat     statbuf;
     int             rc;
     int             updated = 0;
 
+    strcpy(tmp_name, TMP_SPASSWD);
     tmp = mkstemp(tmp_name);
     if (!tmp)
         return errno;
