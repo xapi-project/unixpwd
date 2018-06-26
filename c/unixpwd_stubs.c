@@ -24,7 +24,7 @@
 #include "unixpwd.h"
 
 CAMLprim        value
-caml_getpwd(value caml_user)
+caml_unixpwd_getpwd(value caml_user)
 {
     CAMLparam1(caml_user);
     char           *user;
@@ -44,7 +44,7 @@ caml_getpwd(value caml_user)
 }
 
 CAMLprim        value
-caml_setpwd(value caml_user, value caml_password)
+caml_unixpwd_setpwd(value caml_user, value caml_password)
 {
     CAMLparam2(caml_user, caml_password);
     char           *user,
@@ -60,7 +60,7 @@ caml_setpwd(value caml_user, value caml_password)
 }
 
 CAMLprim        value
-caml_setspw(value caml_user, value caml_password)
+caml_unixpwd_setspw(value caml_user, value caml_password)
 {
     CAMLparam2(caml_user, caml_password);
     char           *user,
@@ -76,7 +76,7 @@ caml_setspw(value caml_user, value caml_password)
 }
 
 CAMLprim        value
-caml_unshadow(void)
+caml_unixpwd_unshadow(void)
 {
     CAMLparam0();
     char           *passwords;
