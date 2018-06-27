@@ -95,24 +95,28 @@ unixpwd_setpwd(const char *user, char *password)
 
     strcpy(tmp_name, TMP_PASSWD);
     tmp = mkstemp(tmp_name);
-    if (!tmp)
+    if (tmp == -1)
         return errno;
     if (stat(ETC_PASSWD, &statbuf) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     if (fchmod(tmp, statbuf.st_mode) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     tmp_file = fdopen(tmp, "w");
     if (!tmp_file) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
 
     setpwent();
@@ -155,24 +159,28 @@ unixpwd_setspw(const char *user, char *password)
 
     strcpy(tmp_name, TMP_SPASSWD);
     tmp = mkstemp(tmp_name);
-    if (!tmp)
+    if (tmp == -1)
         return errno;
     if (stat(ETC_SPASSWD, &statbuf) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     if (fchown(tmp, statbuf.st_uid, statbuf.st_gid) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     if (fchmod(tmp, statbuf.st_mode) != 0) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     tmp_file = fdopen(tmp, "w");
     if (!tmp_file) {
+        rc = errno;
         close(tmp);
-        return errno;
+        return rc;
     }
     if (lckpwdf() != 0) {
         close(tmp);
@@ -202,6 +210,7 @@ unixpwd_setspw(const char *user, char *password)
         return EINVAL;
     }
     if (rename(tmp_name, ETC_SPASSWD) != 0) {
+        rc = errno;
         ulckpwdf();
         return errno;
     }
