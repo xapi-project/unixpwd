@@ -25,7 +25,7 @@ clean:
 		rm -f shadow.* passwd.*
 
 indent:
-		indent -orig -nut unixpwd.c unixpwd.h unixpwd_stub.c
+		indent -orig -nut unixpwd.c unixpwd.h unixpwd_stubs.c
 
 valgrind: unixpwd
 		valgrind $(VOPTS) ./unixpwd root

@@ -23,7 +23,7 @@ int
 main(int argc, char **argv)
 {
     int             rc;
-    char           *pw;
+    char           *pwd;
     char           *buf;
 
     switch (argc) {
@@ -38,15 +38,36 @@ main(int argc, char **argv)
         break;
 
     case 2:
-        pw = unixpwd_get(argv[1]);
-        if (pw) {
-            printf("%s: %s\n", argv[1], pw);
-            free(pw);
+        pwd = unixpwd_get(argv[1]);
+        if (pwd) {
+            printf("%s: %s\n", argv[1], pwd);
+            free(pwd);
             rc = 0;
         } else {
             fprintf(stderr, "can't find entry for %s\n", argv[1]);
             rc = 1;
         }
+        
+        pwd = unixpwd_getpwd(argv[1]);
+        if (pwd) {
+            printf("/etc/passwd: %s: %s\n", argv[1], pwd);
+            free(pwd);
+            rc = 0;
+        } else {
+            fprintf(stderr, "can't find entry for %s\n", argv[1]);
+            rc = 1;
+        }
+
+        pwd = unixpwd_getspw(argv[1]);
+        if (pwd) {
+            printf("/etc/shadow: %s: %s\n", argv[1], pwd);
+            free(pwd);
+            rc = 0;
+        } else {
+            fprintf(stderr, "can't find entry for %s\n", argv[1]);
+            rc = 1;
+        }
+
         break;
 
     case 3:

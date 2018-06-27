@@ -39,6 +39,31 @@
 #define BUFLEN 4096
 
 char           *
+unixpwd_getpwd(const char *user)
+{
+    struct passwd   pwd,
+                   *pw;
+    char            buf[BUFLEN];
+
+    if (getpwnam_r(user, &pwd, buf, BUFLEN, &pw) == 0 && pw)
+        return strdup(pw->pw_passwd);
+    return NULL;
+}
+
+char           *
+unixpwd_getspw(const char *user)
+{
+    struct spwd     spw,
+                   *sp;
+    char            buf[BUFLEN];
+
+    if (getspnam_r(user, &spw, buf, BUFLEN, &sp) == 0 && sp)
+        return strdup(sp->sp_pwdp);
+    return NULL;
+}
+
+
+char           *
 unixpwd_get(const char *user)
 {
     struct spwd     spw,

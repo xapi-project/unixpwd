@@ -23,8 +23,51 @@
 
 #include "unixpwd.h"
 
+
 CAMLprim        value
 caml_unixpwd_getpwd(value caml_user)
+{
+    CAMLparam1(caml_user);
+    char           *user;
+    char           *passwd;
+    CAMLlocal1(pw);
+
+    user = String_val(caml_user);
+    passwd = unixpwd_getpwd(user);
+    if (passwd == NULL && errno != 0)
+        caml_failwith(strerror(errno));
+    if (passwd == NULL)
+        caml_failwith("unspecified error in caml_getpwd()");
+
+    pw = caml_copy_string(passwd);
+    free(passwd);
+    CAMLreturn(pw);
+}
+
+CAMLprim        value
+caml_unixpwd_getspw(value caml_user)
+{
+    CAMLparam1(caml_user);
+    char           *user;
+    char           *passwd;
+    CAMLlocal1(pw);
+
+    user = String_val(caml_user);
+    passwd = unixpwd_getspw(user);
+    if (passwd == NULL && errno != 0)
+        caml_failwith(strerror(errno));
+    if (passwd == NULL)
+        caml_failwith("unspecified error in caml_getspw()");
+
+    pw = caml_copy_string(passwd);
+    free(passwd);
+    CAMLreturn(pw);
+}
+
+
+
+CAMLprim        value
+caml_unixpwd_get(value caml_user)
 {
     CAMLparam1(caml_user);
     char           *user;
@@ -36,7 +79,7 @@ caml_unixpwd_getpwd(value caml_user)
     if (passwd == NULL && errno != 0)
         caml_failwith(strerror(errno));
     if (passwd == NULL)
-        caml_failwith("unspecified error in caml_getpwd()");
+        caml_failwith("unspecified error in caml_get()");
 
     pw = caml_copy_string(passwd);
     free(passwd);

@@ -14,11 +14,16 @@
 
 /*
  * get password for user. The result must be passed to free(). On error,
- * returns NULL and errno set.
+ * returns NULL and errno set. unixpwd_get tries to obtain the shadow
+ * password first and if that fails to obtain the password from
+ * /etc/passwd.  getpwd(). unixpwd_setpwd() obtains the passowrd from
+ * /etc/passwd and unixpwd_setspw() obtains the password from
+ * /etc/shadow.
  */
 
 char           *unixpwd_get(const char *user);
-
+char           *unixpwd_getpwd(const char *user);
+char           *unixpwd_getspw(const char *user);
 /*
  * return /etc/passswd as a string but with entries from shadow passwords
  * when they exist. The returned string must be passed to free(). On
