@@ -3,11 +3,11 @@ let user = "unixpwd"
 
 let cycle n =
   let pw = Printf.sprintf "unixpwd-%06d" n in
-  Unixpwd.Stubs.setspw user pw;
-  ignore (Unixpwd.Stubs.unshadow () |> String.length);
-  assert (Unixpwd.Stubs.get user = pw);
-  Unixpwd.Stubs.setpwd user pw;
-  assert (Unixpwd.Stubs.get user = pw)
+  Unixpwd.setspw user pw;
+  ignore (Unixpwd.unshadow () |> String.length);
+  assert (Unixpwd.getspw user = pw);
+  Unixpwd.setpwd user pw;
+  assert (Unixpwd.getpwd user = pw)
 
 let main () =
   for i = 1 to 100_000 do
