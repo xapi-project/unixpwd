@@ -18,8 +18,42 @@ for the underlying C functions.
 # C Code
 
 The C code lives in directory `c/` and contains a Makefile that is not
-used by the build process for [OCaml] bindings but provides a way to
-build a stand-alone binary for testing from the command line.
+used by the build process for [OCaml] bindings but was used during
+development of the C code.
+
+# Command Line Interface
+
+The Makefile in directory `c/` builds a small binary for tests. This is
+especially useful for debugging purposes with GDB.
+
+```sh
+$ cd c
+$ make
+$ ./unixpwd root
+root: x
+/etc/passwd: root: x
+can't find shadow entry for root: Permission denied
+
+$ ./unixpwd | head
+root:x:0:0:root:/root
+daemon:x:1:1:daemon:/usr/sbin
+bin:x:2:2:bin:/bin
+sys:x:3:3:sys:/dev
+sync:x:4:65534:sync:/bin
+games:x:5:60:games:/usr/games
+man:x:6:12:man:/var/cache/man
+lp:x:7:7:lp:/var/spool/lpd
+mail:x:8:8:mail:/var/mail
+news:x:9:9:news:/var/spool/news
+```
+
+# Testing
+
+Directory `test/` contains a small [OCaml] program that reads and
+updates password entries. Since it needs to be run as root and uses the
+system's password database, it is not run automatically. It is
+configures to update the account `unixpwd` that you might want to create
+for this purpose.
 
 
 [OCaml]:   https://www.ocaml.org/
