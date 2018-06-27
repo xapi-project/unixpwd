@@ -7,7 +7,8 @@ let cycle n =
   ignore (Unixpwd.unshadow () |> String.length);
   assert (Unixpwd.getspw user = pw);
   Unixpwd.setpwd user pw;
-  assert (Unixpwd.getpwd user = pw)
+  assert (Unixpwd.getpwd user = pw);
+  if n mod 10 = 0 then Printf.eprintf "cycle %6d\n" n
 
 let main () =
   for i = 1 to 100_000 do
