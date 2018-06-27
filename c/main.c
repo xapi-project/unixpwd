@@ -16,6 +16,7 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "unixpwd.h"
 
@@ -25,46 +26,51 @@ main(int argc, char **argv)
     int             rc;
     char           *pwd;
     char           *buf;
+    char           *msg;
 
     switch (argc) {
     case 1:
         buf = unixpwd_unshadow();
+        msg = strerror(errno);
         if (buf) {
             puts(buf);
             free(buf);
         } else {
-            fprintf(stderr, "can't unshadow\n");
+            fprintf(stderr, "can't unshadow: %s\n", msg);
         }
         break;
 
     case 2:
         pwd = unixpwd_get(argv[1]);
+        msg = strerror(errno);
         if (pwd) {
             printf("%s: %s\n", argv[1], pwd);
             free(pwd);
             rc = 0;
         } else {
-            fprintf(stderr, "can't find entry for %s\n", argv[1]);
+            fprintf(stderr, "can't find entry for %s: %s\n", argv[1], msg);
             rc = 1;
         }
         
         pwd = unixpwd_getpwd(argv[1]);
+        msg = strerror(errno);
         if (pwd) {
             printf("/etc/passwd: %s: %s\n", argv[1], pwd);
             free(pwd);
             rc = 0;
         } else {
-            fprintf(stderr, "can't find entry for %s\n", argv[1]);
+            fprintf(stderr, "can't find passwd entry for %s: %s\n", argv[1], msg);
             rc = 1;
         }
 
         pwd = unixpwd_getspw(argv[1]);
+        msg = strerror(errno);
         if (pwd) {
             printf("/etc/shadow: %s: %s\n", argv[1], pwd);
             free(pwd);
             rc = 0;
         } else {
-            fprintf(stderr, "can't find entry for %s\n", argv[1]);
+            fprintf(stderr, "can't find shadow entry for %s: %s\n", argv[1], msg);
             rc = 1;
         }
 
@@ -72,14 +78,16 @@ main(int argc, char **argv)
 
     case 3:
         rc = unixpwd_setpwd(argv[1], argv[2]);
+        msg = strerror(errno);
         if (rc != 0) {
-            fprintf(stderr, "error setting password: %d\n", rc);
+            fprintf(stderr, "error setting password: %s\n", msg);
             rc = 1;
             break;
         }
         rc = unixpwd_setspw(argv[1], argv[2]);
+        msg = strerror(errno);
         if (rc != 0) {
-            fprintf(stderr, "error setting shadow password: %d\n", rc);
+            fprintf(stderr, "error setting shadow password: %s\n", msg);
             rc = 1;
             break;
         }
