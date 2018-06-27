@@ -20,7 +20,8 @@ clean:
 	jbuilder clean
 
 test:
-	jbuilder runtest
+	@echo "see test/ for test code. It requires root acceess."
+	# jbuilder runtest
 
 # requires odoc
 doc:
