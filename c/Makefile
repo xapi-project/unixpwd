@@ -28,6 +28,6 @@ indent:
 		indent -orig -nut unixpwd.c unixpwd.h unixpwd_stubs.c
 
 valgrind: unixpwd
-		valgrind $(VOPTS) ./unixpwd root
-		valgrind $(VOPTS) ./unixpwd root foo
-		valgrind $(VOPTS) ./unixpwd > /dev/null
+		valgrind $(VOPTS) ./unixpwd root || true
+		valgrind $(VOPTS) ./unixpwd root foo || true
+		valgrind $(VOPTS) ./unixpwd > /dev/null || true
