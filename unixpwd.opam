@@ -5,7 +5,7 @@ maintainer:     "xen-api@lists.xen.org"
 authors:        [ "xen-api@lists.xen.org" ]
 homepage:       "https://github.com/xapi-project/unixpwd"
 bug-reports:    "https://github.com/xapi-project/unixpwd/issues"
-license:        "BSD"
+license:        "MIT"
 dev-repo:       "https://github.com/xapi-project/unixpwd.git"
 build: [
   ["jbuilder" "build" "-j" jobs "@install"]
