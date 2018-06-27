@@ -218,7 +218,7 @@ unixpwd_setspw(const char *user, char *password)
     if (rename(tmp_name, ETC_SPASSWD) != 0) {
         rc = errno;
         ulckpwdf();
-        return errno;
+        return rc;
     }
     ulckpwdf();
     return 0;
