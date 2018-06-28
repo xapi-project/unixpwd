@@ -250,11 +250,11 @@ unixpwd_unshadow(void)
         char            tmp[BUFLEN];
         int             written;
 
-        if (getpwent_r(&pwd, pwbuf, BUFLEN, &pw) != 0)
+        if (getpwent_r(&pwd, pwbuf, BUFLEN, &pw) != 0 || !pw)
             break;
         getspnam_r(pw->pw_name, &spw, spbuf, BUFLEN, &sp);
 
-        written = snprintf(tmp, BUFLEN, "%s:%s:%d:%d:%s:%s\n",
+        written = snprintf(tmp, BUFLEN, "%s:%s:%d:%d:%s:%s:%s\n",
                            pw->pw_name,
                            sp ? sp->sp_pwdp : pw->pw_passwd,
                            pw->pw_uid,
