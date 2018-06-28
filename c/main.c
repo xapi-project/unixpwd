@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mcheck.h>
 
 #include "unixpwd.h"
 
@@ -28,8 +29,19 @@ main(int argc, char **argv)
     char           *buf;
     char           *msg;
 
+    mtrace();
     switch (argc) {
     case 1:
+        for (int i = 0; i < 100; i++) {
+            buf = unixpwd_unshadow();
+            msg = strerror(errno);
+            if (buf) {
+                free(buf);
+            } else {
+                fprintf(stderr, "can't unshadow: %s\n", msg);
+                break;
+            }
+        }
         buf = unixpwd_unshadow();
         msg = strerror(errno);
         if (buf) {
@@ -37,6 +49,7 @@ main(int argc, char **argv)
             free(buf);
         } else {
             fprintf(stderr, "can't unshadow: %s\n", msg);
+            break;
         }
         break;
 
@@ -51,7 +64,7 @@ main(int argc, char **argv)
             fprintf(stderr, "can't find entry for %s: %s\n", argv[1], msg);
             rc = 1;
         }
-        
+
         pwd = unixpwd_getpwd(argv[1]);
         msg = strerror(errno);
         if (pwd) {
@@ -59,7 +72,8 @@ main(int argc, char **argv)
             free(pwd);
             rc = 0;
         } else {
-            fprintf(stderr, "can't find passwd entry for %s: %s\n", argv[1], msg);
+            fprintf(stderr, "can't find passwd entry for %s: %s\n",
+                    argv[1], msg);
             rc = 1;
         }
 
@@ -70,7 +84,8 @@ main(int argc, char **argv)
             free(pwd);
             rc = 0;
         } else {
-            fprintf(stderr, "can't find shadow entry for %s: %s\n", argv[1], msg);
+            fprintf(stderr, "can't find shadow entry for %s: %s\n",
+                    argv[1], msg);
             rc = 1;
         }
 

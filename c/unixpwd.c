@@ -48,7 +48,7 @@ unixpwd_getpwd(const char *user)
     if (getpwnam_r(user, &pwd, buf, BUFLEN, &pw) == 0 && pw)
         return strdup(pw->pw_passwd);
     if (errno == 0)
-      errno = EINVAL;
+        errno = EINVAL;
     return NULL;
 }
 
@@ -62,7 +62,7 @@ unixpwd_getspw(const char *user)
     if (getspnam_r(user, &spw, buf, BUFLEN, &sp) == 0 && sp)
         return strdup(sp->sp_pwdp);
     if (errno == 0)
-      errno = EINVAL;
+        errno = EINVAL;
     return NULL;
 }
 
@@ -81,7 +81,7 @@ unixpwd_get(const char *user)
     if (getpwnam_r(user, &pwd, buf, BUFLEN, &pw) == 0 && pw)
         return strdup(pw->pw_passwd);
     if (errno == 0)
-      errno = EINVAL;
+        errno = EINVAL;
     return NULL;
 }
 
