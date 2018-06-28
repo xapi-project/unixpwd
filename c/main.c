@@ -109,7 +109,7 @@ main(int argc, char **argv)
         break;
 
     default:
-        fprintf(stderr, "usage: opasswd user [password]\n");
+        fprintf(stderr, "usage: unixpwd [user [password]]\n");
         rc = 1;
     }
     exit(rc);

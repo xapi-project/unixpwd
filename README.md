@@ -55,7 +55,15 @@ system's password database, it is not run automatically. It is
 configures to update the account `unixpwd` that you might want to create
 for this purpose.
 
+# Known Issues
+
+The Makefile in the `c/` directory contains support for running
+[valgrind] to find memory leaks. Valgrind reports some reachable memory
+at exit. As far as I can tell, this is related to memory allocated by
+libc for `/etc/nsswitch`.
+
+* [getpwnam_r memory leak](https://stackoverflow.com/q/1447018)
 
 [OCaml]:   https://www.ocaml.org/
 [opasswd]: https://github.com/xapi-project/ocaml-opasswd.git
-
+[valgrind]: http://valgrind.org/
