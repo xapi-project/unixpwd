@@ -4,7 +4,7 @@
 
 CC 		= gcc
 CFLAGS 	= -g -DDEVELOPMENT
-CFLAGS 	= -g
+CFLAGS 	= -g -Wall
 
 VOPTS   += --track-fds=yes
 VOPTS   += --tool=memcheck
