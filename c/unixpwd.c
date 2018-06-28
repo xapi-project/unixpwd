@@ -99,7 +99,7 @@ unixpwd_setpwd(const char *user, char *password)
     int             rc;
     int             updated = 0;
 
-    strcpy(tmp_name, TMP_PASSWD);
+    strncpy(tmp_name, TMP_PASSWD, sizeof tmp_name);
     tmp = mkstemp(tmp_name);
     if (tmp == -1)
         return errno;
@@ -163,7 +163,7 @@ unixpwd_setspw(const char *user, char *password)
     int             rc;
     int             updated = 0;
 
-    strcpy(tmp_name, TMP_SPASSWD);
+    strncpy(tmp_name, TMP_SPASSWD, sizeof tmp_name);
     tmp = mkstemp(tmp_name);
     if (tmp == -1)
         return errno;
