@@ -24,7 +24,7 @@ end
 exception Error of string
 
 let wrap f = try f () with Failure msg -> raise (Error msg)
-   
+
 let getpwd user     = wrap (fun () -> Stubs.getpwd user)
 let getspw user     = wrap (fun () -> Stubs.getspw user)
 let get    user     = wrap (fun () -> Stubs.get    user)

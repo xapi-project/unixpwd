@@ -27,7 +27,7 @@ char           *unixpwd_getspw(const char *user);
 /*
  * return /etc/passswd as a string but with entries from shadow passwords
  * when they exist. The returned string must be passed to free(). On
- * error, returns NULL and errno set. 
+ * error, returns NULL and errno set.
  */
 
 char           *unixpwd_unshadow(void);
@@ -36,7 +36,7 @@ char           *unixpwd_unshadow(void);
  * update password for user in /etc/passwd and /etc/shadow respectively
  * and return 0 on success and errno otherwise. Specific errors: EINVAL:
  * no password entry for user exists ENOLCK: can't acquire lock for
- * unixpwd_setspw 
+ * unixpwd_setspw
  */
 
 int             unixpwd_setpwd(const char *user, char *password);
