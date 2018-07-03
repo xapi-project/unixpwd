@@ -28,11 +28,12 @@ main(int argc, char **argv)
     char           *pwd;
     char           *buf;
     char           *msg;
+    int             i;
 
     mtrace();
     switch (argc) {
     case 1:
-        for (int i = 0; i < 100; i++) {
+        for (i = 0; i < 100; i++) {
             buf = unixpwd_unshadow();
             msg = strerror(errno);
             if (buf) {
