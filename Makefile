@@ -2,6 +2,8 @@
 #
 #
 
+USER = unixpwd
+
 .PHONY: build release install uninstall clean test doc reindent
 
 build:
@@ -19,9 +21,10 @@ uninstall:
 clean:
 	jbuilder clean
 
-test:
-	@echo "see test/ for test code. It requires root acceess."
-	# jbuilder runtest
+test: build
+	sudo useradd $(USER)
+	sudo ./_build/default/test/main.exe $(USER)
+	sudo userdel $(USER)
 
 # requires odoc
 doc:

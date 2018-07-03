@@ -1,19 +1,26 @@
 
-let user = "unixpwd"
+let default_user = "unixpwd"
 
-let cycle n =
+let cycle user rounds n =
   let pw = Printf.sprintf "unixpwd-%06d" n in
   Unixpwd.setspw user pw;
   ignore (Unixpwd.unshadow () |> String.length);
   assert (Unixpwd.getspw user = pw);
   Unixpwd.setpwd user pw;
   assert (Unixpwd.getpwd user = pw);
-  if n mod 10 = 0 then Printf.eprintf "cycle %6d\n" n
+  if n mod (rounds/80) = 0 then begin
+    print_char '='; flush stdout
+  end
 
 let main () =
-  for i = 1 to 100_000 do
-    cycle i
-  done
+  let rounds = 500_000 in
+  let user = match Sys.argv with
+    | [|_;name|] -> name
+    | _          -> default_user in
+  for n = 1 to rounds do
+    cycle user rounds n
+  done;
+  print_char '\n'
 
 let () =
   if !Sys.interactive then
