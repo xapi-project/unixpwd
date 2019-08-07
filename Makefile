@@ -1,25 +1,22 @@
-#
-#
-#
-
+PROFILE=release
 USER = unixpwd
 
 .PHONY: build release install uninstall clean test doc reindent
 
 build:
-	jbuilder build @install --dev
+	dune build --profile=$(PROFILE) @install
 
 release:
-	jbuilder build @install
+	dune build --profile=$(PROFILE) @install
 
 install:
-	jbuilder install
+	dune install --profile=$(PROFILE)
 
 uninstall:
-	jbuilder uninstall
+	dune uninstall --profile=$(PROFILE)
 
 clean:
-	jbuilder clean
+	dune clean
 
 test: build
 	sudo useradd $(USER)
@@ -28,7 +25,7 @@ test: build
 
 # requires odoc
 doc:
-	jbuilder build @doc
+	dune build @doc
 
 reindent:
 	git ls-files '*.ml' '*.mli' | xargs ocp-indent --inplace

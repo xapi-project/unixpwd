@@ -1,4 +1,0 @@
-(library
- ((name unixpwd)
-  (public_name unixpwd)
-  (libraries (unixpwd.stubs))))
