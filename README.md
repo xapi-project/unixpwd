@@ -1,4 +1,9 @@
 
+This repository is currently read-only because the code has been
+vendored into https://github.com/xapi-project/xen-api and is not
+maintained independently.
+
+
 # Unix Password
 
 This is a simple C library with OCaml bindings to support updating Unix
