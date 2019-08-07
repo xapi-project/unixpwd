@@ -1,5 +1,5 @@
 (library
- (name unixpwd.stubs)
+ (name unixpwd_stubs)
  (public_name unixpwd.stubs)
  (wrapped false)
  (c_names unixpwd unixpwd_stubs))
